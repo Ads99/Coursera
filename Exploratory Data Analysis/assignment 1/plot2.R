@@ -26,7 +26,7 @@ rm(list = ls())
 # Windows
 #setwd('C://Users//ABaker//Documents//GitHub//Coursera//Exploratory Data Analysis//assignment 1')
 # OS X
-#setwd('/Users/adam_baker_1/GitHub/Coursera/Exploratory Data Analysis/assignment 1')
+#setwd('/Users/adam_baker_1/Coursera/Exploratory Data Analysis/assignment 1')
 
 # Read in the "features.txt" file which contains column headers for each of the test_X and train_X data sets
 features <- read.table("household_power_consumption.txt", sep = ";", header = TRUE, na.strings = "?")
