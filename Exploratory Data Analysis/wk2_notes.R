@@ -84,4 +84,68 @@ qplot(displ, hwy, data = mpg, color = drv, geom = c("point", "smooth"), method =
 qplot(displ, hwy, data = mpg, color = drv, geom = c("point", "smooth"), method = "lm", facets = .~drv)
 
 ## Lecture 5 -- ggplot2 (part 3)
+## More underlying functions about ggplot (prev lecture was about 'qplot')
+## Plots are built up in layers (unlike Lattice)
 
+qplot(displ, hwy, data = mpg, facets = .~drv, geom = c("point", "smooth"), method = "lm")
+
+## Recreated using ggplot framework
+g <- ggplot(mpg, aes(displ, hwy)) 
+summary(g)
+
+print(g) # there is no plot yet!
+p <- g + geom_point()
+print(p) # A plot appears
+# Alternatively you can auto-print without saving to an object
+g + geom_point()
+
+## Lecture 6 -- ggplot2 (part 4)
+## Adding More Layers: Smooth
+g + geom_point() + geom_smooth() # or
+g + geom_point() + geom_smooth(method = "lm") # Linear model
+
+## Adding More Layers: Facets
+g + geom_point() + facet_grid(.~drv) + geom_smooth(method = "lm") # Linear model
+
+## Modifying Aesthetics
+g + geom_point(color = "steelblue", size = 4, alpha = 1/2) # colour is assigned a constant
+g + geom_point(aes(color = drv), size = 4, alpha = 1/2)    # colour is assigned a different colour for each variable
+
+## Modifying Labels
+g + geom_point(aes(color = drv), size = 4, alpha = 1/2) + labs(titlew = "Analysis of Displacement vs Hwy by Drive Type") +
+    labs(x = expression("log " * PM[2.5]), y = "Hwy") # this is a way to get a small "2.5"
+
+## Customising the Smooth
+g + geom_point(aes(color = drv), size = 4, alpha = 1/2) +
+    labs(titlew = "Analysis of Displacement vs Hwy by Drive Type") +
+    labs(x = expression("log " * PM[2.5]), y = "Hwy") +
+    geom_smooth(size = 4, linetype = 3, method = "lm", se = FALSE) # se = FALSE - turns off confidence interval
+
+## Changing the Theme
+g + geom_point(aes(color = drv)) + theme_bw(base_family = "Times") # theme has changed as well as font ("Times")
+
+## Lecture 7 -- ggplot2 (part 5)
+## A Note about Axis Limits
+
+testdat <- data.frame(x = 1:100, y = rnorm(100))
+testdat[50, 2] <- 100 ## Outlier
+plot(testdat$x, testdat$y, type = "l", ylim = c(-3, 3)) ## Looks fine, the axes scale to fit excluding outlier
+
+g <- ggplot(testdat, aes(x = x, y = y))
+g + geom_line()                                         ## Not so fine, all points are shown
+
+## 2 options
+g + geom_line() + ylim(-3, 3)                           ## ggplot subsets the data and the outlier appears to not exist
+g + geom_line() + coord_cartesian(ylim = c(-3,3))       ## now this is valid
+
+## More complex example
+## As a continuous variable changes, how does the relationship change?
+## Need to use the cut() function to categorise the variable
+
+## This is for illustration only - it doesn't really make sense to categorise this
+## specific variable, however the idea is to show it is possible
+
+## Calculate the quartiles of the data
+cutpoints <- quantile(mpg$cty, seq(0, 1, length = 4), na.rm = TRUE)
+## Cut the data at the quartiles and create a new factor variable
+mpg$
