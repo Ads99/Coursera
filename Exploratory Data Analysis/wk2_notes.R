@@ -146,6 +146,22 @@ g + geom_line() + coord_cartesian(ylim = c(-3,3))       ## now this is valid
 ## specific variable, however the idea is to show it is possible
 
 ## Calculate the quartiles of the data
-cutpoints <- quantile(mpg$cty, seq(0, 1, length = 4), na.rm = TRUE)
+cutpoints <- quantile(mpg$cty, seq(0, 1, 0.25), na.rm = TRUE)
 ## Cut the data at the quartiles and create a new factor variable
-mpg$
+str(mpg)
+mpg$cty_new <- cut(mpg$cty, cutpoints)
+## See the levels of the newly created factor variable
+levels(mpg$cty_new)
+
+## Code for Final Plot
+## Set up ggplot with data frame
+g <- ggplot(mpg, aes(displ, hwy))
+
+## Add layers
+g + geom_point(alpha = 1/3) +
+    facet_wrap(drv ~ cty_new) +
+    geom_smooth(method = "lm", se=FALSE, col="steelblue") +
+    theme_bw(base_family = "Avenir", base_size = 10) + 
+    labs(x = "displacement") +
+    labs(y = "hwy") +
+    labs(title = "My fancy graph")
