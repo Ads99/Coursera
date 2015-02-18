@@ -15,11 +15,15 @@ dist(dataFrame) # Calculates all pairwise distances - defaults to Euclidean dist
 ## Hierarchical clustering - hclust
 distxy <- dist(dataFrame)
 hClustering <- hclust(distxy)
-par(mar = c(2, 2, 2, 2))
+par(mar = c(5, 5, 5, 5))
 plot(hClustering)
 
 ## Prettier dendrograms
 setwd("C:/Users/ABaker/Documents/GitHub/Coursera/Exploratory Data Analysis")
 source("myplclust.R")
-
 myplclust(hClustering, lab = rep(1:3, each = 4), lab.col = rep(1:3, each = 4))
+
+## Heatmap function - good for visualising matrix data
+set.seed(143)
+dataMatrix <- as.matrix(dataFrame)[sample(1:12),]
+heatmap(dataMatrix)
