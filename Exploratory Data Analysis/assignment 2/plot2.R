@@ -1,4 +1,4 @@
-# Exploratory Data Analysis - Course Assignment 2 - Plot1
+# Exploratory Data Analysis - Course Assignment 2 - Plot2
 
 # Dataset:
 #  PM2.5 Emissions Data:
@@ -57,7 +57,7 @@ NEI.24510_sum_by_year <- aggregate(NEI.24510$Emissions, by=list(NEI.24510$year),
 ## Now we can use the barplot function to plot by year the sum of emissions
 barplot(NEI.24510_sum_by_year$x, names = NEI.24510_sum_by_year$Group.1, xlab = "Year",
         ylab = expression("Total Emissions (tonnes) " * PM[2.5]),
-        main = "Baltimore Emissions (tonnes) by Year (FIPS=24510)",
+        main = "Baltimore (24510) Emissions (tonnes) / Year",
         col = "lightcyan2")
 dev.copy(png, file = "plot2.png")
 dev.off()
