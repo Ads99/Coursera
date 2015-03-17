@@ -33,9 +33,9 @@ str(NEI)
 # rm(NEI)
 # rm(SCC)
 
-## Plot 1 - Have total emissions from PM2.5 decreased in the United States from
-##          1999 to 2008? Using the base plotting system, make a plot showing the
-##          total PM2.5 emission from all sources for each of the years 1999, 2002, 2005, and 2008.
+## Plot 2 - Have total emissions from PM2.5 decreased in Baltimore City, Maryland
+##          (fips == "24510") from 1999 to 2008? Use the base plotting system
+##          to answer this question
 
 ## First need to convert the year variable to a factor
 NEI[,"year"] = as.factor(NEI[,"year"])
@@ -49,10 +49,12 @@ str(NEI)
 NEI.24510 <- NEI[which(NEI$fips == "24510"),]
 str(NEI.24510)
 
-## Now we need to  summarise the data by year. We can do this one of two ways
-
-## using aggregate and creating a new data.frame
+## Now we need to summarise the data by year.
+## We use aggregate and create a new data.frame
 NEI.24510_sum_by_year <- aggregate(NEI.24510$Emissions, by=list(NEI.24510$year), FUN=sum)
+
+## Set default plotting parameters
+par(mar=c(5.1, 4.1, 4.1, 2.1), mgp=c(3, 1, 0), las=0, mfrow = c(1, 1))
 
 ## Now we can use the barplot function to plot by year the sum of emissions
 barplot(NEI.24510_sum_by_year$x, names = NEI.24510_sum_by_year$Group.1, xlab = "Year",

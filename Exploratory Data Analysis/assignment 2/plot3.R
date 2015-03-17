@@ -1,4 +1,4 @@
-# Exploratory Data Analysis - Course Assignment 2 - Plot1
+# Exploratory Data Analysis - Course Assignment 2 - Plot3
 
 # Dataset:
 #  PM2.5 Emissions Data:
@@ -33,35 +33,43 @@ str(NEI)
 # rm(NEI)
 # rm(SCC)
 
-## Plot 1 - Have total emissions from PM2.5 decreased in the United States from
-##          1999 to 2008? Using the base plotting system, make a plot showing the
-##          total PM2.5 emission from all sources for each of the years 1999, 2002, 2005, and 2008.
+## Plot 3 - Of the four types of sources indicated by the type (point, nonpoint, onroad, nonroad) variable,
+##          which of these four sources have seen decreases in emissions from 1999-2008 for Baltimore City?
+##          Which have seen increases in emissions from 1999-2008?
+##          Use the ggplot2 plotting system to make a plot answer this question.
 
 ## First need to convert the year variable to a factor
 NEI[,"year"] = as.factor(NEI[,"year"])
 str(NEI)
 
-## I'll also convert Pollutant to a factor just to check the values
-## mergedData[,"Pollutant"] = as.factor(mergedData[,"Pollutant"])
-## str(mergedData$Pollutant)
+## Now we need to filter on only fips == 24510
+NEI.24510 <- NEI[which(NEI$fips == "24510"),]
+str(NEI.24510)
 
-## Now we need to  summarise the data by year. We can do this one of two ways
+## We can now remove the NEI variable
+rm(NEI)
 
+## Now I'll convert the 'type' variable to a factor
+NEI.24510[,"type"] = as.factor(NEI.24510[,"type"])
+str(NEI.24510)
+table(NEI.24510$type)
+
+## Now we need to  summarise the data by year AND type
 ## using aggregate and creating a new data.frame
-NEI_sum_by_year_1 <- aggregate(NEI$Emissions, by=list(NEI$year), FUN=sum)
+NEI.24510_sum_by_year_type <- aggregate(NEI.24510$Emissions, by=list(NEI.24510$year, NEI.24510$type), FUN=sum)
+## Now change the field names back to what they should be
+colnames(NEI.24510_sum_by_year_type) <- c("year", "type", "emissions_sum")
 
-## using tapply
-NEI_sum_by_year_2 <- data.frame(
-    year = levels(as.factor(NEI$year)),
-    sumEmissions = tapply(NEI$Emissions, NEI$year, sum))
+## Bring in the ggplot2 library and also the reshape2 library
+library(ggplot2)
 
 ## Set default plotting parameters
 par(mar=c(5.1, 4.1, 4.1, 2.1), mgp=c(3, 1, 0), las=0, mfrow = c(1, 1))
 
-## Now we can use the barplot function to plot by year the sum of emissions
-barplot(NEI_sum_by_year_1$x, names = NEI_sum_by_year_1$Group.1, xlab = "Year",
-        ylab = expression("Total Emissions (tonnes) " * PM[2.5]),
-        main = "Total Emissions (tonnes) by Year",
-        col = "wheat")
-dev.copy(png, file = "plot1.png")
+## Now we can use the ggplot qplot function to plot separate charts for each type
+ggplot(NEI.24510_sum_by_year_type, aes(x = year, y = emissions_sum)) +
+    geom_bar(aes(fill = year), position = "dodge", stat = "identity") +
+    facet_grid(. ~ type)
+
+dev.copy(png, file = "plot3.png")
 dev.off()
