@@ -1,4 +1,4 @@
-# Exploratory Data Analysis - Course Assignment 2 - Plot4
+# Exploratory Data Analysis - Course Assignment 2 - Plot5
 
 # Dataset:
 #  PM2.5 Emissions Data:
@@ -33,51 +33,46 @@ head(mergedData)
 rm(NEI)
 rm(SCC)
 
-## Plot 4 - Across the United States, how have emissions from coal combustion-related sources
-##          changed from 1999-2008
+## Plot 5 - How have emissions from motor vehicle sources changed from 1999-2008
+##          in Baltimore City?
 
-## First we need to find emissions related to coal combustion
-table(mergedData$Data.Category) ## Not this one
-table(mergedData$Short.Name) ## Not this one
+## First we need to find emissions related to motor vehicles
 table(mergedData$EI.Sector)
 '''
-this one where values in
-c("Fuel Comb - Comm/Institutional - Coal",
-  "Fuel Comb - Electric Generation - Coal",
-  "Fuel Comb - Industrial Boilers, ICEs - Coal")
+this one where values have "Vehicles" at the end
 '''
 
 ## Filter on all coal combustion related sources
-NEI.Coal <- subset(mergedData, EI.Sector %in% c("Fuel Comb - Comm/Institutional - Coal",
-                                                "Fuel Comb - Electric Generation - Coal",
-                                                "Fuel Comb - Industrial Boilers, ICEs - Coal"))
+NEI.Vehicles <- subset(mergedData, grepl("Vehicles", mergedData$EI.Sector))
+NEI.Vehicles <- droplevels(NEI.Vehicles)
+table(NEI.Vehicles$EI.Sector)
 
-## We can now remove the mergedData variable
+## Also filter on only Baltimore City, fips == 24510
+NEI.Vehicles.24510 <- NEI.Vehicles[which(NEI.Vehicles$fips == "24510"),]
+str(NEI.Vehicles.24510)
+
+## We can now remove the other variables
 rm(mergedData)
-
-## The pre-subset EI.Sector column levels will still exist in this data frame...
-table(NEI.Coal$EI.Sector)
-## So we can drop the old levels using the following
-NEI.Coal <- droplevels(NEI.Coal)
-table(NEI.Coal$EI.Sector)
+rm(NEI.Vehicles)
 
 ## We may also want to rename the factor variables to be more concise
 ## First we need to convert to character
-NEI.Coal$EI.Sector <- as.character(NEI.Coal$EI.Sector)
-NEI.Coal$EI.Sector[NEI.Coal$EI.Sector == "Fuel Comb - Comm/Institutional - Coal"] <- "Comm/Insitutional"
-NEI.Coal$EI.Sector[NEI.Coal$EI.Sector == "Fuel Comb - Electric Generation - Coal"] <- "Electric Generation"
-NEI.Coal$EI.Sector[NEI.Coal$EI.Sector == "Fuel Comb - Industrial Boilers, ICEs - Coal"] <- "Industrial Boilers, ICEs"
+NEI.Vehicles.24510$EI.Sector <- as.character(NEI.Vehicles.24510$EI.Sector)
+NEI.Vehicles.24510$EI.Sector[NEI.Vehicles.24510$EI.Sector == "Mobile - On-Road Diesel Heavy Duty Vehicles"] <- "On-Road Diesel Heavy Duty"
+NEI.Vehicles.24510$EI.Sector[NEI.Vehicles.24510$EI.Sector == "Mobile - On-Road Diesel Light Duty Vehicles"] <- "On-Road Diesel Light Duty"
+NEI.Vehicles.24510$EI.Sector[NEI.Vehicles.24510$EI.Sector == "Mobile - On-Road Gasoline Heavy Duty Vehicles"] <- "On-Road Gas Heavy Duty"
+NEI.Vehicles.24510$EI.Sector[NEI.Vehicles.24510$EI.Sector == "Mobile - On-Road Gasoline Light Duty Vehicles"] <- "On-Road Gas Light Duty"
 ## Now convert back to a factor
-NEI.Coal$EI.Sector <- as.factor(NEI.Coal$EI.Sector)
+NEI.Vehicles.24510$EI.Sector <- as.factor(NEI.Vehicles.24510$EI.Sector)
 
 ## Now need to  convert the year variable to a factor
-NEI.Coal[,"year"] = as.factor(NEI.Coal[,"year"])
-str(NEI.Coal)
+NEI.Vehicles.24510[,"year"] = as.factor(NEI.Vehicles.24510[,"year"])
+str(NEI.Vehicles.24510)
 
 ## Now we need to  summarise the data by 'year' AND EI.Sector using aggregate and creating a new data.frame
-NEI.Coal_sum_by_sector <- aggregate(NEI.Coal$Emissions, by=list(NEI.Coal$year, NEI.Coal$EI.Sector), FUN=sum)
+NEI.Vehicles.24510_agg <- aggregate(NEI.Vehicles.24510$Emissions, by=list(NEI.Vehicles.24510$year, NEI.Vehicles.24510$EI.Sector), FUN=sum)
 ## Now change the field names back to what they should be
-colnames(NEI.Coal_sum_by_sector) <- c("year", "sector", "emissions_sum")
+colnames(NEI.Vehicles.24510_agg) <- c("year", "sector", "emissions_sum")
 
 ## Bring in the ggplot2 library and also the reshape2 library
 library(ggplot2)
@@ -86,9 +81,9 @@ library(ggplot2)
 par(mar=c(5.1, 4.1, 4.1, 2.1), mgp=c(3, 1, 0), las=0, mfrow = c(1, 1))
 
 ## Now we can use the ggplot qplot function to plot separate charts for each type
-ggplot(NEI.Coal_sum_by_sector, aes(x = year, y = emissions_sum)) +
+ggplot(NEI.Vehicles.24510_agg, aes(x = year, y = emissions_sum)) +
     geom_bar(aes(fill = year), position = "dodge", stat = "identity") +
     facet_grid(. ~ sector)
 
-dev.copy(png, file = "plot4.png")
+dev.copy(png, file = "plot5.png")
 dev.off()
